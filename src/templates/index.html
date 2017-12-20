@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}MemeArchive.org{% endblock %}
+
+{% block head %}
+<style>
+    body {
+        background-color: #EDEDEE;
+    }
+    .main.container {
+        margin-top: 7em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ui card" style="width:auto">
+    <div class="content">
+        <a class="header">MemeArchive.org</a>
+        <div class="description">
+            Meme Archive is a non-profit library of transcribed and catalogued memes.
+            Meme Archive seeks to preserve meme culture as digital data degrades and sites go offline.
+            <div style="margin-top:1rem" class="ui icon fluid input">
+                <input type="text" placeholder="Search the Archive">
+                <i class="search icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

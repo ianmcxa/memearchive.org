@@ -1,9 +1,0 @@
-pgHost = "localhost"
-pgUser = "root"
-pgPass = ""
-pgDatabase = "memes"
-pgPort = 5432
-minimoHost = ""
-minioAccessKey = ""
-minioSecretKey = ""
-webPort = 8080
