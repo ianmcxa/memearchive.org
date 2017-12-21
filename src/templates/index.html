@@ -29,4 +29,18 @@
 </div>
 
 <h2 class="ui center aligned header">Latest Memes</h2>
+<div class="ui four column grid">
+    {% for meme in latest_memes %}
+    <div class="column">
+        <div class="ui card">
+            <div class="image">
+                <img src="{{ meme.get_url() }}">
+            </div>
+            <div class="content">
+                <span class="header">{{ meme.name }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

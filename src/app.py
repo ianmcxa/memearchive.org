@@ -23,8 +23,12 @@ class Meme(db.Model):
     original = db.Column(db.Boolean)
     upload_ip = db.Column(db.String(128), nullable=False)
 
+    def get_url(self):
+        return '{}/memes/{}'.format(MINO_URL, self.name)
+
 
 ### MINIO CONFIGURATION ###
+MINO_URL = 'http://localhost:9000'
 minioClient = Minio('localhost:9000',
                     access_key='9VAVA93ASWI3IJROBS2W',
                     secret_key='BsBJfwNGmrVWqBDooo1QozlEMtmuDceEGni0eu/C',
@@ -68,7 +72,9 @@ def setup():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # get the latest 8 memes
+    latest_memes = db.session.query(Meme).order_by(Meme.id).limit(8)
+    return render_template('index.html', latest_memes=latest_memes)
 
 
 @app.route('/about')
@@ -86,6 +92,7 @@ def minio_upload(file, name) -> bool:
     except ResponseError as err:
         app.logger.error('Could not upload file, is minio running?\n{}'.format(err))
         return False
+
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -114,6 +121,8 @@ def upload():
                 db.session.add(meme)
                 db.session.commit()
                 return render_template('upload.html', success=True)
+            else:
+                return render_template('upload.html', failed=True, error_message='Could not upload to image storage')
 
         return render_template('upload.html', failed=True, error_message='Invalid file type')
 
