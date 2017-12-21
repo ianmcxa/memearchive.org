@@ -13,20 +13,28 @@
 
 {% block content %}
 {% if success %}
-<div class="ui green message">Upload Succeeded</div>
+<div class="ui success message">
+    <i class="close icon"></i>
+    <div class="header">Upload Succeeded</div>
+</div>
 {% endif %}
 {% if failed %}
-<div class="ui red message">Upload Failed</div>
-{% endif %}
+<div class="ui negative message">
+    <i class="close icon"></i>
+    <div class="header">Upload Failed</div>
+    <p>{{ error_message }}</p>
+</div>{% endif %}
 
 <h1 class="ui heading">Upload A Meme</h1>
 <p>
     Please make sure the meme you are uploading isn't currently in our library.
 </p>
-<form class="ui form" method=post enctype=multipart/form-data>
+<!-- This image will show when something is uploaded -->
+<img id="image" class="ui medium image">
+<form style="margin-top:1rem" class="ui form" method=post enctype=multipart/form-data>
     <label class="huge ui button green">
         Upload <i style="margin-left:.5rem" class="upload icon"></i>
-        <input type="file" name="file" hidden>
+        <input id="file-upload" type="file" name="file" hidden>
     </label>
     <div style="margin-top:.5rem" class="required field">
         <label>Name</label>
@@ -49,5 +57,25 @@
     <button class="ui button" type="submit">Submit</button>
 </form>
 
-<script>$('.ui.checkbox').checkbox();</script>
+<script>
+    $('.ui.checkbox').checkbox()
+
+    document.getElementById("file-upload").onchange = function () {
+        var reader = new FileReader()
+
+        reader.onload = function (e) {
+            // get loaded data and render thumbnail.
+            document.getElementById("image").src = e.target.result
+        };
+
+        // read the image file as a data URL.
+        reader.readAsDataURL(this.files[0])
+    }
+
+    $('.message .close')
+        .on('click', function() {
+            $(this).closest('.message').transition('fade')
+        }
+    )
+</script>
 {% endblock %}

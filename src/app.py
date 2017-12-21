@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
 from minio import Minio
+from minio.policy import Policy
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
                          BucketAlreadyExists)
 
@@ -38,6 +39,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+@app.cli.command('setup')
 def setup():
     app.logger.debug('running setup')
     # setup minio
@@ -50,6 +52,12 @@ def setup():
     except BucketAlreadyExists as err:
         app.logger.debug('bucket memes already exists')
         pass
+    except ResponseError as err:
+        app.logger.debug('Could not connect to minio, is it running?')
+        raise
+
+    try:
+        minioClient.set_bucket_policy('memes', '', Policy.READ_ONLY)
     except ResponseError as err:
         app.logger.debug('Could not connect to minio, is it running?')
         raise
@@ -79,17 +87,16 @@ def minio_upload(file, name) -> bool:
         app.logger.error('Could not upload file, is minio running?\n{}'.format(err))
         return False
 
-
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            return render_template('upload.html', failed=True)
+            return render_template('upload.html', failed=True, error_message='No file uploaded')
         file = request.files['file']
         # if we get an empty filename
         if file.filename == '':
-            return render_template('upload.html', failed=True)
+            return render_template('upload.html', failed=True, error_message='Cannot upload blank file')
         if file and allowed_file(file.filename):
             # get the metadata from the submitted form
             name = request.form['name']
@@ -108,6 +115,6 @@ def upload():
                 db.session.commit()
                 return render_template('upload.html', success=True)
 
-        return render_template('upload.html', failed=True)
+        return render_template('upload.html', failed=True, error_message='Invalid file type')
 
     return render_template('upload.html')
