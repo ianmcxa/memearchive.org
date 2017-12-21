@@ -8,7 +8,7 @@
         background-color: #EDEDEE;
     }
     .main.container {
-        margin-top: 7em;
+        margin-top: 5em;
     }
 </style>
 {% endblock %}
@@ -20,10 +20,16 @@
     </div>
     <div class="content">
         <span class="header">{{ meme.name }}</span>
+        {% if meme.transcription or meme.source_url %}
         <div class="description">
+            {% if meme.transcription %}
             <p><strong>transcription:</strong> {{ meme.transcription }}</p>
+            {% endif %}
+            {% if meme.source_url %}
             <p><strong>source url:</strong> <a href="{{ meme.source_url }}">{{ meme.source_url }}</a></p>
+            {% endif %}
         </div>
+        {% endif %}
     </div>
     {% if meme.original %}
     <div class="extra content">This is an original meme</div>

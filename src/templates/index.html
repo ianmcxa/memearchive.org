@@ -33,11 +33,11 @@
     {% for meme in latest_memes %}
     <div class="column">
         <div class="ui card">
-            <div class="image">
+            <a class="image" href="{{ meme.get_page() }}">
                 <img src="{{ meme.get_url() }}">
-            </div>
+            </a>
             <div class="content">
-                <span class="header">{{ meme.name }}</span>
+                <a href="{{ meme.get_page() }}" class="header">{{ meme.name }}</a>
             </div>
         </div>
     </div>

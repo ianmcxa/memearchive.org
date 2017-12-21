@@ -23,8 +23,13 @@ class Meme(db.Model):
     original = db.Column(db.Boolean)
     upload_ip = db.Column(db.String(128), nullable=False)
 
+    # returns a direct link to the image
     def get_url(self):
         return '{}/memes/{}'.format(MINO_URL, self.id)
+
+    # returns a link to the meme page for this meme
+    def get_page(self):
+        return '/meme/{}'.format(self.id)
 
 
 ### MINIO CONFIGURATION ###
@@ -73,13 +78,24 @@ def setup():
 @app.route('/')
 def index():
     # get the latest 8 memes
-    latest_memes = db.session.query(Meme).order_by(Meme.id).limit(8)
+    latest_memes = Meme.query.order_by(Meme.id).limit(8)
     return render_template('index.html', latest_memes=latest_memes)
 
 
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+
+@app.route('/meme/<meme_id>')
+def meme(meme_id):
+    if not meme_id:
+        return render_template('meme.html', invalid=True)
+
+    meme_id = int(meme_id)
+
+    meme = Meme.query.filter_by(id=meme_id).first()
+    return render_template('meme.html', meme=meme)
 
 
 def minio_upload(file, name: str) -> bool:
@@ -118,7 +134,7 @@ def upload():
         db.session.commit()
         image_saved = minio_upload(file, str(meme.id))
         if image_saved:
-            return render_template('upload.html', success=True)
+            return render_template('upload.html', success=True, meme_link=request)
         else:
             db.session.delete(meme)
             db.session.commit()
