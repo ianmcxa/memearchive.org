@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
 from minio import Minio
 from minio.policy import Policy
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
@@ -78,7 +79,7 @@ def setup():
 @app.route('/')
 def index():
     # get the latest 8 memes
-    latest_memes = Meme.query.order_by(Meme.id).limit(8)
+    latest_memes = Meme.query.order_by(desc(Meme.id)).limit(8)
     return render_template('index.html', latest_memes=latest_memes)
 
 
@@ -124,17 +125,19 @@ def upload():
             return render_template('upload.html', failed=True, error_message='Invalid file type')
 
         # get the metadata from the submitted form
+        original = 'original' in request.form
+
         meme = Meme(name=request.form['name'],
                     transcription=request.form['transcription'],
                     source_url=request.form['src-url'],
-                    original=request.form['original'],
+                    original=original,
                     upload_ip=request.remote_addr)
 
         db.session.add(meme)
         db.session.commit()
         image_saved = minio_upload(file, str(meme.id))
         if image_saved:
-            return render_template('upload.html', success=True, meme_link=request)
+            return render_template('upload.html', success=True, meme_link='/meme/{}'.format(meme.id))
         else:
             db.session.delete(meme)
             db.session.commit()
