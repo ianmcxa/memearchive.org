@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Upload - MemeArchive.org{% endblock %}
+
+{% block head %}
+<style>
+    .main.container {
+        margin-top: 5em;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+{% if success %}
+<div class="ui green message">Upload Succeeded</div>
+{% endif %}
+{% if failed %}
+<div class="ui red message">Upload Failed</div>
+{% endif %}
+
+<h1 class="ui heading">Upload A Meme</h1>
+<p>
+    Please make sure the meme you are uploading isn't currently in our library.
+</p>
+<form class="ui form" method=post enctype=multipart/form-data>
+    <label class="huge ui button green">
+        Upload <i style="margin-left:.5rem" class="upload icon"></i>
+        <input type="file" name="file" hidden>
+    </label>
+    <div style="margin-top:.5rem" class="required field">
+        <label>Name</label>
+        <input type="text" name="name" placeholder="Name">
+    </div>
+    <div class="required field">
+        <label>Transcription</label>
+        <textarea name="transcription"></textarea>
+    </div>
+    <div class="field">
+        <label>Source URL</label>
+        <input type="text" name="src-url" placeholder="Source URL">
+    </div>
+    <div class="required field">
+        <div class="ui checkbox">
+            <input name="original" type="checkbox" tabindex="0" class="hidden">
+            <label>Is this an original meme?</label>
+        </div>
+    </div>
+    <button class="ui button" type="submit">Submit</button>
+</form>
+
+<script>$('.ui.checkbox').checkbox();</script>
+{% endblock %}

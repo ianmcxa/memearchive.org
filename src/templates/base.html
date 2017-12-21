@@ -3,8 +3,8 @@
 <head>
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
     {% block head %}{% endblock %}
 </head>
 
@@ -17,7 +17,7 @@
             <div class="right menu">
                 <a class="item">Log in</a>
                 <a class="item">Register <i style="margin-left:.5rem" class="user icon"></i></a>
-                <a class="item">Upload <i style="margin-left:.5rem" class="cloud upload icon"></i></a>
+                <a href="/upload" class="item">Upload <i style="margin-left:.5rem" class="cloud upload icon"></i></a>
                 <div class="item">
                     <div class="ui icon input">
                         <input type="text" placeholder="Search">
