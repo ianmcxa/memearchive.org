@@ -24,7 +24,7 @@ class Meme(db.Model):
     upload_ip = db.Column(db.String(128), nullable=False)
 
     def get_url(self):
-        return '{}/memes/{}'.format(MINO_URL, self.name)
+        return '{}/memes/{}'.format(MINO_URL, self.id)
 
 
 ### MINIO CONFIGURATION ###
@@ -82,14 +82,14 @@ def about():
     return render_template('about.html')
 
 
-def minio_upload(file, name) -> bool:
+def minio_upload(file, name: str) -> bool:
     file.seek(0, 2)
     size = file.tell()
     file.seek(0, 0)
     try:
         minioClient.put_object('memes', name, file, size)
         return True
-    except ResponseError as err:
+    except ResponseError or TypeError as err:
         app.logger.error('Could not upload file, is minio running?\n{}'.format(err))
         return False
 
@@ -104,26 +104,24 @@ def upload():
         # if we get an empty filename
         if file.filename == '':
             return render_template('upload.html', failed=True, error_message='Cannot upload blank file')
-        if file and allowed_file(file.filename):
-            # get the metadata from the submitted form
-            name = request.form['name']
-            transcription = request.form['transcription']
-            source_url = request.form['src-url']
-            original = request.form['original']
-            upload_ip = request.remote_addr
+        if not file or not allowed_file(file.filename):
+            return render_template('upload.html', failed=True, error_message='Invalid file type')
 
-            image_saved = minio_upload(file, name)
-            if image_saved:
-                meme = Meme(name=name, transcription=transcription,
-                            source_url=source_url, original=original,
-                            upload_ip=upload_ip)
+        # get the metadata from the submitted form
+        meme = Meme(name=request.form['name'],
+                    transcription=request.form['transcription'],
+                    source_url=request.form['src-url'],
+                    original=request.form['original'],
+                    upload_ip=request.remote_addr)
 
-                db.session.add(meme)
-                db.session.commit()
-                return render_template('upload.html', success=True)
-            else:
-                return render_template('upload.html', failed=True, error_message='Could not upload to image storage')
-
-        return render_template('upload.html', failed=True, error_message='Invalid file type')
+        db.session.add(meme)
+        db.session.commit()
+        image_saved = minio_upload(file, str(meme.id))
+        if image_saved:
+            return render_template('upload.html', success=True)
+        else:
+            db.session.delete(meme)
+            db.session.commit()
+            return render_template('upload.html', failed=True, error_message='Could not upload to image storage')
 
     return render_template('upload.html')

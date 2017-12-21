@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ meme.name }} MemeArchive.org{% endblock %}
+
+{% block head %}
+<style>
+    body {
+        background-color: #EDEDEE;
+    }
+    .main.container {
+        margin-top: 7em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ui card" style="width:auto">
+    <div class="image">
+        <img src="{{ meme.get_url() }}">
+    </div>
+    <div class="content">
+        <span class="header">{{ meme.name }}</span>
+        <div class="description">
+            <p><strong>transcription:</strong> {{ meme.transcription }}</p>
+            <p><strong>source url:</strong> <a href="{{ meme.source_url }}">{{ meme.source_url }}</a></p>
+        </div>
+    </div>
+    {% if meme.original %}
+    <div class="extra content">This is an original meme</div>
+    {% endif %}
+</div>
+{% endblock %}
