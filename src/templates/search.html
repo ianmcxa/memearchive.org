@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Search - MemeArchive.org{% endblock %}
+
+{% block head %}
+<style>
+    body {
+        background-color: #EDEDEE;
+    }
+    .main.container {
+        margin-top: 7em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="two wide column">
+        <h2 style="padding-top:.5em" class="ui header">Search</h2>
+    </div>
+    <div class="fourteen wide column">
+        <div class="search box">
+            <div class="ui icon fluid input">
+                <input value="{{ query }}" type="text" placeholder="Search the Archive">
+                <i class="search icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if results %}
+<h2 class="ui center aligned header">Results</h2>
+<div class="ui four column grid">
+    {% for meme in results %}
+    <div class="column">
+        <div class="ui card">
+            <a class="image" href="{{ meme.get_page() }}">
+                <img src="{{ meme.get_url() }}">
+            </a>
+            <div class="content">
+                <a href="{{ meme.get_page() }}" class="header">{{ meme.name }}</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

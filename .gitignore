@@ -1,7 +1,9 @@
 minio
 data
 *~
-memearchive.db
+.idea/
 
 __pycache__
 *.pyc
+
+memearchive.cfg

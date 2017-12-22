@@ -1,18 +1,16 @@
-from flask import Flask, render_template, request, flash, redirect
+from urllib.parse import unquote_plus
+from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 from minio import Minio
 from minio.policy import Policy
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
                          BucketAlreadyExists)
 
 app = Flask(__name__)
-app.secret_key = '05eb2517-ccfa-4393-a1e9-4cefcb19a2a1'
+app.config.from_
+app.config.from_envvar('MEMEARCHIVE_SETTINGS')
 
-### DATABASE CONFIGURATION ###
-# TODO: use postgres for any real usage
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///memearchive.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
@@ -83,17 +81,28 @@ def index():
     return render_template('index.html', latest_memes=latest_memes)
 
 
+@app.route('/search/<string:quoted_query>')
+def search(quoted_query: str):
+    query = unquote_plus(quoted_query)
+    results = Meme.query.filter(or_(Meme.name.match(query), Meme.transcription.match(query))).all()
+    return render_template('search.html', results=results, query=query)
+
+
+# render the search page on the search route when nothing is entered
+@app.route('/search')
+def search_nothing():
+    return render_template('search.html')
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')
 
 
-@app.route('/meme/<meme_id>')
-def meme(meme_id):
+@app.route('/meme/<int:meme_id>')
+def meme(meme_id: int):
     if not meme_id:
         return render_template('meme.html', invalid=True)
-
-    meme_id = int(meme_id)
 
     meme = Meme.query.filter_by(id=meme_id).first()
     return render_template('meme.html', meme=meme)
