@@ -1,5 +1,6 @@
 from urllib.parse import unquote_plus
-from flask import Flask, render_template, request
+from secrets import token_urlsafe
+from flask import Flask, render_template, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, or_
 from minio import Minio
@@ -30,7 +31,7 @@ class Meme(db.Model):
         return '/meme/{}'.format(self.id)
 
 
-### MINIO CONFIGURATION ###
+# Minio configuration
 minioClient = Minio(app.config['MINIO_URL'].split('/')[2],
                     access_key=app.config['MINIO_ACCESS_KEY'],
                     secret_key=app.config['MINIO_SECRET_KEY'],
@@ -40,9 +41,28 @@ minioClient = Minio(app.config['MINIO_URL'].split('/')[2],
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
+# does a file have the correct extension
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# TODO: this is really basic CSRF that uses sessions, when adding accounts this should be replaced
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = session.pop('_csrf_token', None)
+        if not token or token != request.form.get('_csrf_token'):
+            abort(400)
+
+
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = token_urlsafe(16)
+    return session['_csrf_token']
+
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 
 @app.cli.command('setup')

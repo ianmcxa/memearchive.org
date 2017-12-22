@@ -47,6 +47,7 @@
     </div>
     {% endfor %}
 </div>
+{% endif %}
 
 <script>
     $('#mainSearch').keypress(function(event){
@@ -58,5 +59,4 @@
         window.location.href = '/search/' + encodeURI($('#mainSearch').val())
     })
 </script>
-{% endif %}
 {% endblock %}

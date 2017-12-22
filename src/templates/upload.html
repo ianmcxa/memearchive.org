@@ -33,6 +33,7 @@
 <!-- This image will show when something is uploaded -->
 <img id="image" class="ui medium image">
 <form style="margin-top:1rem" class="ui form" method=post enctype=multipart/form-data>
+    <input type=hidden name=_csrf_token value="{{ csrf_token() }}">
     <label class="huge ui button green">
         Upload <i style="margin-left:.5rem" class="upload icon"></i>
         <input id="file-upload" type="file" name="file" hidden>
