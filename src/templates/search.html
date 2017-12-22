@@ -18,13 +18,16 @@
     <div class="two wide column">
         <h2 style="padding-top:.5em" class="ui header">Search</h2>
     </div>
-    <div class="fourteen wide column">
+    <div class="thirteen wide column">
         <div class="search box">
             <div class="ui icon fluid input">
-                <input value="{{ query }}" type="text" placeholder="Search the Archive">
+                <input id="mainSearch" value="{{ query }}" type="text" placeholder="Search the Archive">
                 <i class="search icon"></i>
             </div>
         </div>
+    </div>
+    <div class="one wide column">
+        <button id="searchButton" style="margin-top:.25em" class="ui secondary button">Go</button>
     </div>
 </div>
 
@@ -44,5 +47,16 @@
     </div>
     {% endfor %}
 </div>
+
+<script>
+    $('#mainSearch').keypress(function(event){
+      if(event.keyCode == 13){
+        window.location.href = '/search/' + encodeURI($('#mainSearch').val())
+      }
+    })
+    $('#searchButton').click(function(event){
+        window.location.href = '/search/' + encodeURI($('#mainSearch').val())
+    })
+</script>
 {% endif %}
 {% endblock %}

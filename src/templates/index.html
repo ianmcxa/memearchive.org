@@ -20,9 +20,16 @@
         <div class="description">
             Meme Archive is a non-profit library of transcribed and catalogued memes.
             Meme Archive seeks to preserve meme culture as digital data degrades and sites go offline.
-            <div style="margin-top:1rem" class="ui icon fluid input">
-                <input type="text" placeholder="Search the Archive">
-                <i class="search icon"></i>
+            <div style="margin-top:.3em" class="ui grid">
+                <div class="fourteen wide column">
+                    <div class="ui icon fluid input">
+                        <input id="mainSearch" type="text" placeholder="Search the Archive">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+                <div class="one wide column">
+                    <button id="searchButton" style="margin-top:.2em" class="ui secondary button">Go</button>
+                </div>
             </div>
         </div>
     </div>
@@ -43,4 +50,15 @@
     </div>
     {% endfor %}
 </div>
+
+<script>
+    $('#mainSearch').keypress(function(event){
+      if(event.keyCode == 13){
+        window.location.href = '/search/' + encodeURI($('#mainSearch').val())
+      }
+    })
+    $('#searchButton').click(function(event){
+        window.location.href = '/search/' + encodeURI($('#mainSearch').val())
+    })
+</script>
 {% endblock %}

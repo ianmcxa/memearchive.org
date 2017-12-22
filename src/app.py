@@ -91,7 +91,7 @@ def search(quoted_query: str):
 
 
 # render the search page on the search route when nothing is entered
-@app.route('/search')
+@app.route('/search/')
 def search_nothing():
     return render_template('search.html')
 

@@ -20,7 +20,7 @@
                 <a href="/upload" class="item">Upload <i style="margin-left:.5rem" class="cloud upload icon"></i></a>
                 <div class="item">
                     <div class="ui icon input">
-                        <input type="text" placeholder="Search">
+                        <input id="navSearch" type="text" placeholder="Search">
                         <i class="search icon"></i>
                     </div>
                 </div>
@@ -29,5 +29,13 @@
     </div>
 
     <div class="ui main text container">{%  block content %}{% endblock %}</div>
+    <script>
+        $('#navSearch').keypress(function(event){
+          if(event.keyCode == 13){
+            window.location.href = '/search/' + encodeURI($('#navSearch').val())
+          }
+        })
+    </script>
+
 </body>
 </html>
