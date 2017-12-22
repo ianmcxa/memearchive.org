@@ -8,7 +8,6 @@ from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
                          BucketAlreadyExists)
 
 app = Flask(__name__)
-app.config.from_
 app.config.from_envvar('MEMEARCHIVE_SETTINGS')
 
 db = SQLAlchemy(app)
@@ -24,7 +23,7 @@ class Meme(db.Model):
 
     # returns a direct link to the image
     def get_url(self):
-        return '{}/memes/{}'.format(MINO_URL, self.id)
+        return '{}/memes/{}'.format(app.config['MINIO_URL'], self.id)
 
     # returns a link to the meme page for this meme
     def get_page(self):
@@ -32,11 +31,10 @@ class Meme(db.Model):
 
 
 ### MINIO CONFIGURATION ###
-MINO_URL = 'http://localhost:9000'
-minioClient = Minio('localhost:9000',
-                    access_key='9VAVA93ASWI3IJROBS2W',
-                    secret_key='BsBJfwNGmrVWqBDooo1QozlEMtmuDceEGni0eu/C',
-                    secure=False)
+minioClient = Minio(app.config['MINIO_URL'].split('/')[2],
+                    access_key=app.config['MINIO_ACCESS_KEY'],
+                    secret_key=app.config['MINIO_SECRET_KEY'],
+                    secure='https://' in app.config['MINIO_URL'])
 
 # Allowed image file extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -84,7 +82,11 @@ def index():
 @app.route('/search/<string:quoted_query>')
 def search(quoted_query: str):
     query = unquote_plus(quoted_query)
-    results = Meme.query.filter(or_(Meme.name.match(query), Meme.transcription.match(query))).all()
+    # note that for postgresql search, you cannot have spaces in your query
+    # you must use either & for and or | for or
+    # https://stackoverflow.com/questions/16465466/postgres-search-query-error-if-space-used
+    results = Meme.query.filter(or_(Meme.name.match(query.replace(' ', '|')),
+                                    Meme.transcription.match(query.replace(' ', '|')))).all()
     return render_template('search.html', results=results, query=query)
 
 

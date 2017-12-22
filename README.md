@@ -4,7 +4,13 @@ The purpose of this site is to preserve humanities memes.
 
 ## Installation
 
-### Postgres Database
+The memearchive system reads a configuration file from the
+`MEMEARCHIVE_SETTINGS` environment variable. An example of this
+configuration file is included in the repo.
 
-You must specify in the configuration the host, user, password, port and database to
-connect to. The default database is memes.
+### Dependencies
+
+* postgresql - stores all metadata. postgres specifically required
+for text search functions needed by the system.
+* [minio](minio.io) - object storage API, S3 can be substituted if you
+are deploying on AWS.
