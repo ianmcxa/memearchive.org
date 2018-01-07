@@ -1,5 +1,4 @@
 from urllib.parse import unquote_plus
-from secrets import token_urlsafe
 from flask import Flask, render_template, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, or_
@@ -7,6 +6,10 @@ from minio import Minio
 from minio.policy import Policy
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
                          BucketAlreadyExists)
+import base64
+import binascii
+import os
+
 
 app = Flask(__name__)
 app.config.from_envvar('MEMEARCHIVE_SETTINGS')
@@ -58,7 +61,7 @@ def csrf_protect():
 
 def generate_csrf_token():
     if '_csrf_token' not in session:
-        session['_csrf_token'] = token_urlsafe(16)
+        session['_csrf_token'] = base64.urlsafe_b64encode(os.urandom(16)).rstrip(b'=').decode('ascii')
     return session['_csrf_token']
 
 
