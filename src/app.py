@@ -9,9 +9,12 @@ from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
 import base64
 import binascii
 import os
+from werkzeug.contrib.fixers import ProxyFix
 
 
 app = Flask(__name__)
+# fix the headers coming from Nginx
+app.wsgi_app = ProxyFix(app.wsgi_app)
 app.config.from_envvar('MEMEARCHIVE_SETTINGS')
 
 db = SQLAlchemy(app)
