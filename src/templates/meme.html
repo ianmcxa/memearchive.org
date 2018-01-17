@@ -21,9 +21,9 @@
     <div class="content">
         <span class="header">{{ meme.name }}</span>
         {% if meme.transcription or meme.source_url %}
-        <div class="description" style="white-space: pre-wrap">
+        <div class="description">
             {% if meme.transcription %}
-            <p><strong>transcription:</strong> {{ meme.transcription }}</p>
+            <p style="white-space: pre-wrap"><strong>transcription:</strong> {{ meme.transcription }}</p>
             {% endif %}
             {% if meme.source_url %}
             <p><strong>source url:</strong> <a href="{{ meme.source_url }}">{{ meme.source_url }}</a></p>
