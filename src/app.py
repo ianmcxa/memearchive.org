@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, or_
 from minio import Minio
-from minio.policy import Policy
+import json
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
                          BucketAlreadyExists)
 import base64
@@ -89,7 +89,34 @@ def setup():
         raise
 
     try:
-        minioClient.set_bucket_policy('memes', '', Policy.READ_ONLY)
+        policy_read_only = {
+            "Version":"2012-10-17",
+            "Statement":[
+                {
+                "Sid":"",
+                "Effect":"Allow",
+                "Principal":{"AWS":"*"},
+                "Action":"s3:GetBucketLocation",
+                "Resource":"arn:aws:s3:::memes"
+                },
+                {
+                "Sid":"",
+                "Effect":"Allow",
+                "Principal":{"AWS":"*"},
+                "Action":"s3:ListBucket",
+                "Resource":"arn:aws:s3:::memes"
+                },
+                {
+                "Sid":"",
+                "Effect":"Allow",
+                "Principal":{"AWS":"*"},
+                "Action":"s3:GetObject",
+                "Resource":"arn:aws:s3:::memes/*"
+                }
+            ]
+        }
+
+        minioClient.set_bucket_policy('memes', '', policy_read_only)
     except ResponseError as err:
         app.logger.debug('Could not connect to minio, is it running?')
         raise
